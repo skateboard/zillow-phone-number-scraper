@@ -1,0 +1,24 @@
+{
+    "title": "Zillow Phone Number Scraper Input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "zpids": {
+            "title": "zPids",
+            "type": "array",
+            "description": "An array of Zillow Product IDs (ZPIDs). You can provide multiple ZPIDs or just one.",
+            "prefill": ["123456789"],
+            "editor": "stringList"
+        },
+        "proxyConfiguration":{
+            "title": "Proxy configuration",
+            "type": "object",
+            "description": "Select proxies for scraper.",
+            "prefill": { "useApifyProxy": true },
+            "editor": "proxy"
+        }
+    },
+    "required": [
+        "zpids"
+    ]
+}
