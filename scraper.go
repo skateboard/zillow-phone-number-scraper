@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -110,53 +109,4 @@ func (s *scraper) scrapePhoneNumber(zPid string) (*response, error) {
 	}
 
 	return &response, nil
-}
-
-func (s *scraper) getApiKey(roomId string) (string, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://www.airbnb.com/rooms/%s/reviews", roomId), nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Add("Host", "www.airbnb.com")
-	req.Header.Add("Sec-Ch-Ua", "\"Chromium\";v=\"127\", \"Not)A;Brand\";v=\"99\"")
-	req.Header.Add("Accept-Language", "en-US")
-	req.Header.Add("Sec-Ch-Ua-Platform-Version", "\"\"")
-	req.Header.Add("Sec-Ch-Ua-Platform", "\"Windows\"")
-	req.Header.Add("Device-Memory", "8")
-	req.Header.Add("Sec-Ch-Ua-Mobile", "?0")
-	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.6533.100 Safari/537.36")
-	req.Header.Add("Viewport-Width", "1536")
-	req.Header.Add("Accept", "*/*")
-	req.Header.Add("Ect", "3g")
-	req.Header.Add("Sec-Fetch-Site", "same-origin")
-	req.Header.Add("Sec-Fetch-Mode", "cors")
-	req.Header.Add("Sec-Fetch-Dest", "empty")
-	req.Header.Add("Accept-Encoding", "gzip, deflate, br")
-	req.Header.Add("Priority", "u=1, i")
-
-	res, err := s.client.Do(req)
-	if err != nil {
-		return "", err
-
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to get api key: %d", res.StatusCode)
-	}
-
-	b, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", err
-	}
-
-	matches := apiKeyRe.FindAllStringSubmatch(string(b), -1)
-
-	if len(matches) == 0 {
-		return "", errors.New("failed to find api key")
-	}
-	apiKey := matches[0][1]
-
-	return apiKey, nil
 }
