@@ -69,6 +69,16 @@ func (s *scraper) Run() {
 }
 
 func (s *scraper) scrapePhoneNumber(zPid string) (*response, error) {
+	client := s.client
+	if s.actor.ProxyConfiguration != nil {
+		proxy, err := s.actor.ProxyConfiguration.Proxy()
+		if err != nil {
+			return nil, err
+		}
+
+		client.SetProxy(proxy.String())
+	}
+
 	payload := fmt.Sprintf("{\"zpid\":\"%s\",\"pageType\":\"BDP\",\"isInstantTourEnabled\":false,\"isCachedInstantTourAvailability\":true,\"tourTypes\":[]}", zPid)
 
 	req, err := http.NewRequest("POST", "https://www.zillow.com/rentals/api/rcf/v1/rcf", strings.NewReader(payload))
@@ -87,7 +97,7 @@ func (s *scraper) scrapePhoneNumber(zPid string) (*response, error) {
 	req.Header.Add("sec-fetch-site", "same-origin")
 	req.Header.Add("te", "trailers")
 
-	res, err := s.client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
